@@ -615,3 +615,71 @@ root@mongo-test-0:/# mongo mongodb://mongo-test-0.mongo-srv,mongo-test-1.mongo-s
 			"name" : "mongo-test-1.mongo-srv:27017",
 			"name" : "mongo-test-2.mongo-srv:27017",
 ```
+
+# 6. Create deployment of "Employee Web app" with 4 repricas awaring mongoDB's ReplicaSet
+```
+vagrant@master:~/kubernetes$ sudo kubectl apply -f employee-replica.yaml 
+service/employee-srv created
+deployment.apps/employee-test created
+
+vagrant@master:~/kubernetes$ watch -x sudo kubectl get all
+Every 2.0s: sudo kubectl get all
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/employee-test-79687ccd49-drjr4   1/1     Running   0          29m
+pod/employee-test-79687ccd49-g276p   1/1     Running   0          29m
+pod/employee-test-79687ccd49-jx9dq   1/1     Running   0          29m
+pod/employee-test-79687ccd49-w8txp   1/1     Running   0          29m
+pod/mongo-test-0                     1/1     Running   0          115m
+pod/mongo-test-1                     1/1     Running   0          113m
+pod/mongo-test-2                     1/1     Running   0          110m
+
+NAME                   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+service/employee-srv   ClusterIP   10.96.199.250   <none>        5001/TCP,5000/TCP   29m
+service/kubernetes     ClusterIP   10.96.0.1       <none>        443/TCP             139m
+service/mongo-srv      ClusterIP   None            <none>        27017/TCP           115m
+
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/employee-test   4/4     4            4           29m
+
+NAME                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/employee-test-79687ccd49   4         4         4       29m
+
+NAME                          READY   AGE
+statefulset.apps/mongo-test   3/3     115m
+
+vagrant@master:~/kubernetes$ sudo kubectl describe pod employee-test |grep ^Node:
+Node:         worker3/192.168.121.56
+Node:         worker1/192.168.121.130
+Node:         worker2/192.168.121.61
+Node:         worker1/192.168.121.130
+```
+
+# 7. Create depolyment of Nginx with 2 repricas
+```
+$ kubectl apply -f nginx-nodeport.yaml 
+
+$ watch -x sudo kubectl get pods
+
+$ kubectl describe pod nginx-test |grep ^Node:
+Node:         worker2/192.168.122.219
+Node:         worker1/192.168.122.18
+
+$ kubectl describe services nginx-srv
+Name:                     nginx-srv
+Namespace:                default
+Labels:                   run=nginx-srv
+Annotations:              <none>
+Selector:                 run=nginx-test
+Type:                     NodePort
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.105.235.123
+IPs:                      10.105.235.123
+Port:                     http  8080/TCP
+TargetPort:               80/TCP
+NodePort:                 http  30001/TCP
+Endpoints:                192.168.189.97:80,192.168.235.130:80
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+```
