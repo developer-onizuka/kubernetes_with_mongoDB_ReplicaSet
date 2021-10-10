@@ -654,32 +654,64 @@ Node:         worker2/192.168.121.61
 Node:         worker1/192.168.121.130
 ```
 
-# 7. Create depolyment of Nginx with 2 repricas
+# 7. Create Nginx's config files and Configmap
 ```
-$ kubectl apply -f nginx-nodeport.yaml 
+$ cat <<EOF > default.conf
+upstream proxy.com {
+        server employee-srv:5001;
+}
 
-$ watch -x sudo kubectl get pods
+server {
+        listen 80;
+        server_name localhost;
+        location / {
+                root /usr/share/nginx/html;
+                index index.html index.htm;
+                proxy_pass https://proxy.com;
+        }
+}
+EOF
 
-$ kubectl describe pod nginx-test |grep ^Node:
-Node:         worker2/192.168.122.219
-Node:         worker1/192.168.122.18
+$ kubectl create configmap nginx-config --from-file=default.conf
+configmap/nginx-config created
+```
 
-$ kubectl describe services nginx-srv
-Name:                     nginx-srv
-Namespace:                default
-Labels:                   run=nginx-srv
-Annotations:              <none>
-Selector:                 run=nginx-test
-Type:                     NodePort
-IP Family Policy:         SingleStack
-IP Families:              IPv4
-IP:                       10.105.235.123
-IPs:                      10.105.235.123
-Port:                     http  8080/TCP
-TargetPort:               80/TCP
-NodePort:                 http  30001/TCP
-Endpoints:                192.168.189.97:80,192.168.235.130:80
-Session Affinity:         None
-External Traffic Policy:  Cluster
-Events:                   <none>
+# 8. Create depolyment of Nginx with 2 repricas
+```
+vagrant@master:~/kubernetes$ sudo kubectl apply -f nginx-nodeport.yaml 
+
+vagrant@master:~/kubernetes$ watch -x sudo kubectl get pods
+Every 2.0s: sudo kubectl get all
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/employee-test-79687ccd49-9ldbb   1/1     Running   0          9m15s
+pod/employee-test-79687ccd49-c8nqc   1/1     Running   0          9m15s
+pod/employee-test-79687ccd49-x8q4j   1/1     Running   0          9m15s
+pod/employee-test-79687ccd49-zs57b   1/1     Running   0          9m15s
+pod/mongo-test-0                     1/1     Running   0          13m
+pod/mongo-test-1                     1/1     Running   0          13m
+pod/mongo-test-2                     1/1     Running   0          13m
+pod/nginx-test-67d9db6c48-5wx76      1/1     Running   0          118s
+pod/nginx-test-67d9db6c48-9cdtn      1/1     Running   0          118s
+
+NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+service/employee-srv   ClusterIP   10.111.205.213   <none>        5001/TCP,5000/TCP   9m15s
+service/kubernetes     ClusterIP   10.96.0.1        <none>        443/TCP             34m
+service/mongo-srv      ClusterIP   None             <none>        27017/TCP           13m
+service/nginx-srv      NodePort    10.106.79.32     <none>        8080:30001/TCP      118s
+
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/employee-test   4/4     4            4           9m15s
+deployment.apps/nginx-test      2/2     2            2           118s
+
+NAME                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/employee-test-79687ccd49   4         4         4       9m15s
+replicaset.apps/nginx-test-67d9db6c48      2         2         2       118s
+
+NAME                          READY   AGE
+statefulset.apps/mongo-test   3/3     13m
+
+vagrant@master:~/kubernetes$ sudo kubectl describe pod nginx-test |grep ^Node:
+Node:         worker2/192.168.121.61
+Node:         worker3/192.168.121.56
+
 ```
