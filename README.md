@@ -86,8 +86,10 @@ EOF
       hashkey=$(openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //')
       ssh vagrant@192.168.33.101 sudo kubeadm join 192.168.33.100:6443 --token $token --discovery-token-ca-cert-hash sha256:$hashkey
       ssh vagrant@192.168.33.102 sudo kubeadm join 192.168.33.100:6443 --token $token --discovery-token-ca-cert-hash sha256:$hashkey
+      ssh vagrant@192.168.33.103 sudo kubeadm join 192.168.33.100:6443 --token $token --discovery-token-ca-cert-hash sha256:$hashkey
       sudo kubectl label node worker1 node-role.kubernetes.io/node=worker1
       sudo kubectl label node worker2 node-role.kubernetes.io/node=worker2
+      sudo kubectl label node worker3 node-role.kubernetes.io/node=worker3
       #curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
       #chmod 700 get_helm.sh
       #./get_helm.sh
