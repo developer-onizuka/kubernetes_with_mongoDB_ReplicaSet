@@ -312,19 +312,23 @@ vagrant@master:~$ sudo kubectl apply -f mongo-replica.yaml
 vagrant@master:~$ sudo kubectl exec -it mongo-test-0 -- mongo
 MongoDB shell version v5.0.3
 connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
-
+```
+```
 > rs.initiate()
 {
 	"info2" : "no configuration specified. Using a default configuration for the set",
 	"me" : "mongo-test-0:27017",
 	"ok" : 1
 }
-
+```
+```
 rs0:SECONDARY> var cfg = rs.conf()
-
+```
+```
 rs0:PRIMARY> cfg.members[0].host="mongo-test-0.mongo-srv:27017"
 mongo-test-0.mongo-srv:27017
-
+```
+```
 rs0:PRIMARY> rs.reconfig(cfg)
 {
 	"ok" : 1,
@@ -427,7 +431,6 @@ rs0:PRIMARY> rs.status()
 	"operationTime" : Timestamp(1633847542, 1)
 }
 ```
-
 ```
 rs0:PRIMARY> rs.add("mongo-test-1.mongo-srv:27017")
 {
@@ -441,6 +444,8 @@ rs0:PRIMARY> rs.add("mongo-test-1.mongo-srv:27017")
 	},
 	"operationTime" : Timestamp(1633847691, 1)
 }
+```
+```
 rs0:PRIMARY> rs.add("mongo-test-2.mongo-srv:27017")
 {
 	"ok" : 1,
