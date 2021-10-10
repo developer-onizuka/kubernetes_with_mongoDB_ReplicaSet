@@ -610,10 +610,13 @@ rs0:PRIMARY> rs.status()
 ```
 ```
 vagrant@master:~$ sudo kubectl exec -it mongo-test-0 -- /bin/bash
-root@mongo-test-0:/# mongo mongodb://mongo-test-0.mongo-srv,mongo-test-1.mongo-srv,mongo-test-2.mongo-srv --eval 'rs.status()' |grep name
+root@mongo-test-0:/# mongo mongodb://mongo-test-0.mongo-srv,mongo-test-1.mongo-srv,mongo-test-2.mongo-srv --eval 'rs.status()' |grep -e name -e stateStr
 			"name" : "mongo-test-0.mongo-srv:27017",
+			"stateStr" : "PRIMARY",
 			"name" : "mongo-test-1.mongo-srv:27017",
+			"stateStr" : "SECONDARY",
 			"name" : "mongo-test-2.mongo-srv:27017",
+			"stateStr" : "SECONDARY",
 ```
 
 # 6. Create deployment of "Employee Web app" with 4 repricas awaring mongoDB's ReplicaSet
