@@ -782,3 +782,84 @@ root@mongo-test-1:/# mongo mongodb://mongo-test-0.mongo-srv,mongo-test-1.mongo-s
 			"name" : "mongo-test-2.mongo-srv:27017",
 			"stateStr" : "SECONDARY",
 ```
+
+# 11. How to access the pod without ClusterIP
+The followings are the endpoint of service, ie... Pod!
+```
+vagrant@master:~$ sudo kubectl get nodes -o=wide
+NAME      STATUS   ROLES                  AGE     VERSION   INTERNAL-IP       EXTERNAL-IP   OS-IMAGE       KERNEL-VERSION     CONTAINER-RUNTIME
+master    Ready    control-plane,master   5h26m   v1.22.2   192.168.121.222   <none>        Ubuntu 20.10   5.8.0-63-generic   docker://20.10.2
+worker1   Ready    node                   5h26m   v1.22.2   192.168.121.130   <none>        Ubuntu 20.10   5.8.0-63-generic   docker://20.10.2
+worker2   Ready    node                   5h26m   v1.22.2   192.168.121.61    <none>        Ubuntu 20.10   5.8.0-63-generic   docker://20.10.2
+worker3   Ready    node                   5h9m    v1.22.2   192.168.121.56    <none>        Ubuntu 20.10   5.8.0-63-generic   docker://20.10.2
+
+vagrant@master:~$ sudo kubectl get services -o=wide
+NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE    SELECTOR
+employee-srv   ClusterIP   10.111.205.213   <none>        5001/TCP,5000/TCP   147m   run=employee-test
+kubernetes     ClusterIP   10.96.0.1        <none>        443/TCP             172m   <none>
+mongo-srv      ClusterIP   None             <none>        27017/TCP           152m   run=mongo-test
+nginx-srv      NodePort    10.106.79.32     <none>        8080:30001/TCP      140m   run=nginx-test
+
+vagrant@master:~$ sudo kubectl get pods -o=wide
+NAME                             READY   STATUS    RESTARTS      AGE     IP                NODE      NOMINATED NODE   READINESS GATES
+dnsutils                         1/1     Running   0             2m54s   192.168.189.78    worker2   <none>           <none>
+employee-test-79687ccd49-5hvfs   1/1     Running   1 (16m ago)   40m     192.168.182.15    worker3   <none>           <none>
+employee-test-79687ccd49-7g4hh   1/1     Running   0             40m     192.168.235.139   worker1   <none>           <none>
+employee-test-79687ccd49-qxm25   1/1     Running   1 (16m ago)   40m     192.168.182.14    worker3   <none>           <none>
+employee-test-79687ccd49-tq74k   1/1     Running   0             40m     192.168.235.140   worker1   <none>           <none>
+mongo-test-0                     1/1     Running   1 (21m ago)   81m     192.168.182.16    worker3   <none>           <none>
+mongo-test-1                     1/1     Running   0             22m     192.168.189.77    worker2   <none>           <none>
+mongo-test-2                     1/1     Running   0             80m     192.168.235.137   worker1   <none>           <none>
+nginx-test-67d9db6c48-2d224      1/1     Running   1 (16m ago)   40m     192.168.182.13    worker3   <none>           <none>
+nginx-test-67d9db6c48-pb9b2      1/1     Running   0             40m     192.168.235.138   worker1   <none>           <none>
+```
+
+The leteral of "mongo-test-0.mongo-srv" means as followings:
+```
+vagrant@master:~$ cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dnsutils
+  labels:
+    name: dnsutils
+spec:
+  containers:
+  - name: dnsutils
+    image: tutum/dnsutils
+    command:
+    - sleep
+    - "3600"
+EOF
+```
+```
+vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup nginx-srv
+Name:	nginx-srv.default.svc.cluster.local
+Address: 10.106.79.32
+```
+```
+vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup employee-srv
+Name:	employee-srv.default.svc.cluster.local
+Address: 10.111.205.213
+```
+```
+vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup mongo-srv
+Name:	mongo-srv.default.svc.cluster.local
+Address: 192.168.189.77
+Name:	mongo-srv.default.svc.cluster.local
+Address: 192.168.182.16
+Name:	mongo-srv.default.svc.cluster.local
+Address: 192.168.235.137
+
+vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup mongo-test-0.mongo-srv
+Name:	mongo-test-0.mongo-srv.default.svc.cluster.local
+Address: 192.168.182.16
+
+vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup mongo-test-1.mongo-srv
+Name:	mongo-test-1.mongo-srv.default.svc.cluster.local
+Address: 192.168.189.77
+
+vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup mongo-test-2.mongo-srv
+Name:	mongo-test-2.mongo-srv.default.svc.cluster.local
+Address: 192.168.235.137
+```
