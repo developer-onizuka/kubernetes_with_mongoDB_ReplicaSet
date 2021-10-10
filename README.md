@@ -813,8 +813,6 @@ mongo-test-2                     1/1     Running   0             80m     192.168
 nginx-test-67d9db6c48-2d224      1/1     Running   1 (16m ago)   40m     192.168.182.13    worker3   <none>           <none>
 nginx-test-67d9db6c48-pb9b2      1/1     Running   0             40m     192.168.235.138   worker1   <none>           <none>
 ```
-
-The leteral of "mongo-test-0.mongo-srv" means as followings:
 ```
 vagrant@master:~$ cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -850,7 +848,9 @@ Name:	mongo-srv.default.svc.cluster.local
 Address: 192.168.182.16
 Name:	mongo-srv.default.svc.cluster.local
 Address: 192.168.235.137
-
+```
+The leteral of "mongo-test-0.mongo-srv" means as followings:
+```
 vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup mongo-test-0.mongo-srv
 Name:	mongo-test-0.mongo-srv.default.svc.cluster.local
 Address: 192.168.182.16
