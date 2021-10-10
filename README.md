@@ -256,7 +256,7 @@ worker2   Ready    node                   94s    v1.22.2
 
 
 ```
-$ cat headless-service.yaml 
+$ cat <<EOF > mongo-replica.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -271,8 +271,7 @@ spec:
   clusterIP: None
   selector:
     run: mongo-test
-    
-$ cat mongodb-statefulset.yaml 
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -306,7 +305,297 @@ spec:
         - name: mongo-data
           persistentVolumeClaim:
             claimName: mongo-pvc
+EOF
+```
+```
+vagrant@master:~$ sudo kubectl apply -f mongo-replica.yaml
+vagrant@master:~$ sudo kubectl exec -it mongo-test-0 -- mongo
+MongoDB shell version v5.0.3
+connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
 
+> rs.initiate()
+{
+	"info2" : "no configuration specified. Using a default configuration for the set",
+	"me" : "mongo-test-0:27017",
+	"ok" : 1
+}
 
+rs0:SECONDARY> var cfg = rs.conf()
+
+rs0:PRIMARY> cfg.members[0].host="mongo-test-0.mongo-srv:27017"
+mongo-test-0.mongo-srv:27017
+
+rs0:PRIMARY> rs.reconfig(cfg)
+{
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1633847333, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1633847333, 1)
+}
+```
+```
+rs0:PRIMARY> rs.status()
+{
+	"set" : "rs0",
+	"date" : ISODate("2021-10-10T06:32:26.087Z"),
+	"myState" : 1,
+	"term" : NumberLong(1),
+	"syncSourceHost" : "",
+	"syncSourceId" : -1,
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"majorityVoteCount" : 1,
+	"writeMajorityCount" : 1,
+	"votingMembersCount" : 1,
+	"writableVotingMembersCount" : 1,
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1633847542, 1),
+			"t" : NumberLong(1)
+		},
+		"lastCommittedWallTime" : ISODate("2021-10-10T06:32:22.274Z"),
+		"readConcernMajorityOpTime" : {
+			"ts" : Timestamp(1633847542, 1),
+			"t" : NumberLong(1)
+		},
+		"appliedOpTime" : {
+			"ts" : Timestamp(1633847542, 1),
+			"t" : NumberLong(1)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1633847542, 1),
+			"t" : NumberLong(1)
+		},
+		"lastAppliedWallTime" : ISODate("2021-10-10T06:32:22.274Z"),
+		"lastDurableWallTime" : ISODate("2021-10-10T06:32:22.274Z")
+	},
+	"lastStableRecoveryTimestamp" : Timestamp(1633847492, 1),
+	"electionCandidateMetrics" : {
+		"lastElectionReason" : "electionTimeout",
+		"lastElectionDate" : ISODate("2021-10-10T06:27:32.245Z"),
+		"electionTerm" : NumberLong(1),
+		"lastCommittedOpTimeAtElection" : {
+			"ts" : Timestamp(0, 0),
+			"t" : NumberLong(-1)
+		},
+		"lastSeenOpTimeAtElection" : {
+			"ts" : Timestamp(1633847252, 1),
+			"t" : NumberLong(-1)
+		},
+		"numVotesNeeded" : 1,
+		"priorityAtElection" : 1,
+		"electionTimeoutMillis" : NumberLong(10000),
+		"newTermStartDate" : ISODate("2021-10-10T06:27:32.257Z"),
+		"wMajorityWriteAvailabilityDate" : ISODate("2021-10-10T06:27:32.275Z")
+	},
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "mongo-test-0.mongo-srv:27017",                               <----- Only 1 mongoDB at this moment.
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 824,
+			"optime" : {
+				"ts" : Timestamp(1633847542, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2021-10-10T06:32:22Z"),
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"electionTime" : Timestamp(1633847252, 2),
+			"electionDate" : ISODate("2021-10-10T06:27:32Z"),
+			"configVersion" : 2,
+			"configTerm" : 1,
+			"self" : true,
+			"lastHeartbeatMessage" : ""
+		}
+	],
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1633847542, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1633847542, 1)
+}
+```
+
+```
+rs0:PRIMARY> rs.add("mongo-test-1.mongo-srv:27017")
+{
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1633847691, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1633847691, 1)
+}
+rs0:PRIMARY> rs.add("mongo-test-2.mongo-srv:27017")
+{
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1633847700, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1633847700, 1)
+}
+```
+
+```
+rs0:PRIMARY> rs.status()
+{
+	"set" : "rs0",
+	"date" : ISODate("2021-10-10T06:37:40.211Z"),
+	"myState" : 1,
+	"term" : NumberLong(1),
+	"syncSourceHost" : "",
+	"syncSourceId" : -1,
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"majorityVoteCount" : 2,
+	"writeMajorityCount" : 2,
+	"votingMembersCount" : 3,
+	"writableVotingMembersCount" : 3,
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1633847852, 1),
+			"t" : NumberLong(1)
+		},
+		"lastCommittedWallTime" : ISODate("2021-10-10T06:37:32.283Z"),
+		"readConcernMajorityOpTime" : {
+			"ts" : Timestamp(1633847852, 1),
+			"t" : NumberLong(1)
+		},
+		"appliedOpTime" : {
+			"ts" : Timestamp(1633847852, 1),
+			"t" : NumberLong(1)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1633847852, 1),
+			"t" : NumberLong(1)
+		},
+		"lastAppliedWallTime" : ISODate("2021-10-10T06:37:32.283Z"),
+		"lastDurableWallTime" : ISODate("2021-10-10T06:37:32.283Z")
+	},
+	"lastStableRecoveryTimestamp" : Timestamp(1633847852, 1),
+	"electionCandidateMetrics" : {
+		"lastElectionReason" : "electionTimeout",
+		"lastElectionDate" : ISODate("2021-10-10T06:27:32.245Z"),
+		"electionTerm" : NumberLong(1),
+		"lastCommittedOpTimeAtElection" : {
+			"ts" : Timestamp(0, 0),
+			"t" : NumberLong(-1)
+		},
+		"lastSeenOpTimeAtElection" : {
+			"ts" : Timestamp(1633847252, 1),
+			"t" : NumberLong(-1)
+		},
+		"numVotesNeeded" : 1,
+		"priorityAtElection" : 1,
+		"electionTimeoutMillis" : NumberLong(10000),
+		"newTermStartDate" : ISODate("2021-10-10T06:27:32.257Z"),
+		"wMajorityWriteAvailabilityDate" : ISODate("2021-10-10T06:27:32.275Z")
+	},
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "mongo-test-0.mongo-srv:27017",                               <----- Primary mongoDB
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 1138,
+			"optime" : {
+				"ts" : Timestamp(1633847852, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2021-10-10T06:37:32Z"),
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"electionTime" : Timestamp(1633847252, 2),
+			"electionDate" : ISODate("2021-10-10T06:27:32Z"),
+			"configVersion" : 6,
+			"configTerm" : 1,
+			"self" : true,
+			"lastHeartbeatMessage" : ""
+		},
+		{
+			"_id" : 1,
+			"name" : "mongo-test-1.mongo-srv:27017",                               <----- Seconday mongoDB Replicaset
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 168,
+			"optime" : {
+				"ts" : Timestamp(1633847852, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1633847852, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2021-10-10T06:37:32Z"),
+			"optimeDurableDate" : ISODate("2021-10-10T06:37:32Z"),
+			"lastHeartbeat" : ISODate("2021-10-10T06:37:40.183Z"),
+			"lastHeartbeatRecv" : ISODate("2021-10-10T06:37:40.179Z"),
+			"pingMs" : NumberLong(0),
+			"lastHeartbeatMessage" : "",
+			"syncSourceHost" : "mongo-test-0.mongo-srv:27017",
+			"syncSourceId" : 0,
+			"infoMessage" : "",
+			"configVersion" : 6,
+			"configTerm" : 1
+		},
+		{
+			"_id" : 2,
+			"name" : "mongo-test-2.mongo-srv:27017",                               <----- Seconday mongoDB Replicaset
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 160,
+			"optime" : {
+				"ts" : Timestamp(1633847852, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1633847852, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2021-10-10T06:37:32Z"),
+			"optimeDurableDate" : ISODate("2021-10-10T06:37:32Z"),
+			"lastHeartbeat" : ISODate("2021-10-10T06:37:40.183Z"),
+			"lastHeartbeatRecv" : ISODate("2021-10-10T06:37:38.689Z"),
+			"pingMs" : NumberLong(1),
+			"lastHeartbeatMessage" : "",
+			"syncSourceHost" : "mongo-test-1.mongo-srv:27017",
+			"syncSourceId" : 1,
+			"infoMessage" : "",
+			"configVersion" : 6,
+			"configTerm" : 1
+		}
+	],
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1633847852, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1633847852, 1)
+}
 
 ```
