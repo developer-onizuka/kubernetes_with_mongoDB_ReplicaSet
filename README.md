@@ -713,5 +713,31 @@ statefulset.apps/mongo-test   3/3     13m
 vagrant@master:~/kubernetes$ sudo kubectl describe pod nginx-test |grep ^Node:
 Node:         worker2/192.168.121.61
 Node:         worker3/192.168.121.56
+```
 
+# 9. Expose Proxy address for outside world using HAproxy on Host Machine
+Docker.io should be installed on Host Machine, prior to this step.
+
+The following picture is taken on my smart phone involved in same network as Host Machine (192.168.11.xx).
+
+https://github.com/developer-onizuka/kubernetes/blob/main/image_123986672.JPG
+
+```
+$ cat <<EOF > haproxy-nodeport.cfg 
+global
+    maxconn 256
+
+defaults
+    mode http
+    timeout client     120000ms
+    timeout server     120000ms
+    timeout connect      6000ms
+
+listen http-in
+    bind *:80
+    server web1 192.168.33.101:30001 
+    server web2 192.168.33.102:30001 
+    server web3 192.168.33.103:30001
+EOF
+$ sudo docker run -itd --rm --name haproxy -p 80:80 -v $(pwd)/haproxy-nodeport.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro haproxy:1.8
 ```
