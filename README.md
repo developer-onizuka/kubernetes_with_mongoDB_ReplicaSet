@@ -253,8 +253,14 @@ worker1   Ready    node                   48m   v1.22.2
 worker2   Ready    node                   48m   v1.22.2
 worker3   Ready    node                   31m   v1.22.2
 ```
+
+# 5. Making MongoDB's ReplicaSet
 ```
-$ cat <<EOF > mongo-replica.yaml
+vagrant@master:~$ git clone https://github.com/developer-onizuka/kubernetes_with_mongoDB_ReplicaSet.git
+```
+```
+vagrant@master:~$ cd kubernetes_with_mongoDB_ReplicaSet
+vagrant@master:~$ cat <<EOF > mongo-replica.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -601,4 +607,11 @@ rs0:PRIMARY> rs.status()
 	"operationTime" : Timestamp(1633847852, 1)
 }
 
+```
+```
+vagrant@master:~$ sudo kubectl exec -it mongo-test-0 -- /bin/bash
+root@mongo-test-0:/# mongo mongodb://mongo-test-0.mongo-srv,mongo-test-1.mongo-srv,mongo-test-2.mongo-srv --eval 'rs.status()' |grep name
+			"name" : "mongo-test-0.mongo-srv:27017",
+			"name" : "mongo-test-1.mongo-srv:27017",
+			"name" : "mongo-test-2.mongo-srv:27017",
 ```
