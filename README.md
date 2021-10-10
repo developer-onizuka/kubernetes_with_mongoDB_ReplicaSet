@@ -403,7 +403,7 @@ rs0:PRIMARY> rs.status()
 	"members" : [
 		{
 			"_id" : 0,
-			"name" : "mongo-test-0.mongo-srv:27017",                          <----- Only 1 mongoDB at this moment.
+			"name" : "mongo-test-0.mongo-srv:27017",                     <----- Only 1 mongoDB at this moment.
 			"health" : 1,
 			"state" : 1,
 			"stateStr" : "PRIMARY",
@@ -521,7 +521,7 @@ rs0:PRIMARY> rs.status()
 	"members" : [
 		{
 			"_id" : 0,
-			"name" : "mongo-test-0.mongo-srv:27017",                          <----- Primary mongoDB
+			"name" : "mongo-test-0.mongo-srv:27017",                     <----- Primary mongoDB
 			"health" : 1,
 			"state" : 1,
 			"stateStr" : "PRIMARY",
@@ -543,7 +543,7 @@ rs0:PRIMARY> rs.status()
 		},
 		{
 			"_id" : 1,
-			"name" : "mongo-test-1.mongo-srv:27017",                          <----- Seconday mongoDB Replicaset
+			"name" : "mongo-test-1.mongo-srv:27017",                     <----- Seconday mongoDB Replicaset
 			"health" : 1,
 			"state" : 2,
 			"stateStr" : "SECONDARY",
@@ -570,7 +570,7 @@ rs0:PRIMARY> rs.status()
 		},
 		{
 			"_id" : 2,
-			"name" : "mongo-test-2.mongo-srv:27017",                          <----- Seconday mongoDB Replicaset
+			"name" : "mongo-test-2.mongo-srv:27017",                     <----- Seconday mongoDB Replicaset
 			"health" : 1,
 			"state" : 2,
 			"stateStr" : "SECONDARY",
