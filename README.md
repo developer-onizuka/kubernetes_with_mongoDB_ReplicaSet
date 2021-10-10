@@ -738,9 +738,37 @@ defaults
 
 listen http-in
     bind *:80
-    server web1 192.168.33.101:30001 
-    server web2 192.168.33.102:30001 
-    server web3 192.168.33.103:30001
+    server web1 192.168.33.101:30001 check
+    server web2 192.168.33.102:30001 check
+    server web3 192.168.33.103:30001 check
 EOF
 $ sudo docker run -itd --rm --name haproxy -p 80:80 -v $(pwd)/haproxy-nodeport.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro haproxy:1.8
 ```
+
+# 10. Check if failover will be succeed if Primary failed
+```
+vagrant@master:~$ sudo kubectl exec -it mongo-test-0 -- /bin/bash
+root@mongo-test-0:/# mongo mongodb://mongo-test-0.mongo-srv,mongo-test-1.mongo-srv,mongo-test-2.mongo-srv --eval 'rs.status()' |grep -e name -e stateStr
+			"name" : "mongo-test-0.mongo-srv:27017",
+			"stateStr" : "PRIMARY",
+			"name" : "mongo-test-1.mongo-srv:27017",
+			"stateStr" : "SECONDARY",
+			"name" : "mongo-test-2.mongo-srv:27017",
+			"stateStr" : "SECONDARY",
+```
+
+In above condition, Shutdown the node which Primary resides in. 
+After 10 seconds or later, Primary mongoDB moved some nodes like below: 
+And I could keep doing curl the Web App thru Nginx.
+
+```
+vagrant@master:~$ sudo kubectl exec -it mongo-test-1 -- /bin/bash
+root@mongo-test-1:/# mongo mongodb://mongo-test-0.mongo-srv,mongo-test-1.mongo-srv,mongo-test-2.mongo-srv --eval 'rs.status()' |grep -e name -e stateStr
+			"name" : "mongo-test-0.mongo-srv:27017",
+			"stateStr" : "(not reachable/healthy)",
+			"name" : "mongo-test-1.mongo-srv:27017",
+			"stateStr" : "PRIMARY",
+			"name" : "mongo-test-2.mongo-srv:27017",
+			"stateStr" : "SECONDARY",
+```
+
