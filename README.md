@@ -165,7 +165,7 @@ EOF
     SHELL
   end
 #-------------------- worker3 --------------------#
-  config.vm.define "worker2_192.168.33.103" do |server|
+  config.vm.define "worker3_192.168.33.103" do |server|
     server.vm.network "private_network", ip: "192.168.33.103"
     server.vm.hostname = "worker3"
     server.vm.provision "shell", privileged: true, inline: <<-SHELL
