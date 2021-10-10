@@ -247,14 +247,12 @@ $ vagrant up --provider=libvirt
 You can login to the master-node (192.168.33.100), so you can check if master and workers are ready.
 ```
 vagrant@master:~$ sudo kubectl get nodes
-NAME      STATUS   ROLES                  AGE    VERSION
-master    Ready    control-plane,master   2m8s   v1.22.2
-worker1   Ready    node                   96s    v1.22.2
-worker2   Ready    node                   94s    v1.22.2
+NAME      STATUS   ROLES                  AGE   VERSION
+master    Ready    control-plane,master   48m   v1.22.2
+worker1   Ready    node                   48m   v1.22.2
+worker2   Ready    node                   48m   v1.22.2
+worker3   Ready    node                   31m   v1.22.2
 ```
-
-
-
 ```
 $ cat <<EOF > mongo-replica.yaml
 apiVersion: v1
