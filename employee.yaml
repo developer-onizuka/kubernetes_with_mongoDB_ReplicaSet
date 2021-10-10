@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-srv
+  labels:
+    run: employee-srv
+spec:
+#  type: NodePort
+  ports:
+  - port: 5001
+    targetPort: 5001
+    protocol: TCP
+    name: https
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: http
+  selector:
+    run: employee-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-test
+spec:
+  selector:
+    matchLabels:
+      run: employee-test
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        run: employee-test
+    spec:
+      containers:
+      - name: employee
+        image: developeronizuka/employee:1.0.0
+        ports:
+        - containerPort: 5001
+        - containerPort: 5000
+        env:
+        - name: MONGO
+          value: mongo-srv
