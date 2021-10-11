@@ -25,7 +25,7 @@ $ vagrant init generic/ubuntu2010
 ```
 
 # 3. Edit Vagrantfile
-You might use the file of Vagrantfile located in the /mnt/vagrant/ubuntu below:
+You might use the file of Vagrantfile below:
 ```
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
