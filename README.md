@@ -260,7 +260,11 @@ vagrant@master:~$ git clone https://github.com/developer-onizuka/kubernetes_with
 ```
 ```
 vagrant@master:~$ cd kubernetes_with_mongoDB_ReplicaSet
-vagrant@master:~$ cat <<EOF > mongo-replica.yaml
+vagrant@master:~/kubernetes_with_mongoDB_ReplicaSet$ sudo kubectl apply -f sc.yaml 
+vagrant@master:~/kubernetes_with_mongoDB_ReplicaSet$ sudo kubectl apply -f mongo-pvc.yaml 
+```
+```
+vagrant@master:~$ cat mongo-replica.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -309,7 +313,6 @@ spec:
         - name: mongo-data
           persistentVolumeClaim:
             claimName: mongo-pvc
-EOF
 ```
 ```
 vagrant@master:~$ sudo kubectl apply -f mongo-replica.yaml
