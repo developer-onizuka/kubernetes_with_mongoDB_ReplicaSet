@@ -853,6 +853,8 @@ Name:	mongo-srv.default.svc.cluster.local
 Address: 192.168.235.137
 ```
 The leteral of "mongo-test-0.mongo-srv" means as followings:
+The headless service of mongo-srv provides the DNS lookup for all the mongodb pods (mongo-test-0, mongo-test-1 and mongo-test-2).
+
 ```
 vagrant@master:~$ sudo kubectl exec -it dnsutils -- nslookup mongo-test-0.mongo-srv
 Name:	mongo-test-0.mongo-srv.default.svc.cluster.local
