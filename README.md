@@ -76,8 +76,8 @@ EOF
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
       sudo apt-get update
-      #sudo apt-get install -y -q kubelet kubectl kubeadm
-      sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
+      sudo apt-get install -y -q kubelet kubectl kubeadm
+      #sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       sudo apt-mark hold kubelet kubeadm kubectl
       sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=192.168.33.100
       mkdir -p $HOME/.kube
@@ -130,8 +130,8 @@ EOF
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
       sudo apt-get update
-      #sudo apt-get install -y -q kubelet kubectl kubeadm
-      sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
+      sudo apt-get install -y -q kubelet kubectl kubeadm
+      #sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       sudo apt-mark hold kubelet kubeadm kubectl
       sudo apt-get -y install nfs-client
       sudo mount -v 192.168.33.11:/ /mnt
@@ -166,8 +166,8 @@ EOF
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
       sudo apt-get update
-      #sudo apt-get install -y -q kubelet kubectl kubeadm
-      sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
+      sudo apt-get install -y -q kubelet kubectl kubeadm
+      #sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       sudo apt-mark hold kubelet kubeadm kubectl
       sudo apt-get -y install nfs-client
       sudo mount -v 192.168.33.11:/ /mnt
@@ -202,8 +202,8 @@ EOF
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
       sudo apt-get update
-      #sudo apt-get install -y -q kubelet kubectl kubeadm
-      sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
+      sudo apt-get install -y -q kubelet kubectl kubeadm
+      #sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       sudo apt-mark hold kubelet kubeadm kubectl
       sudo apt-get -y install nfs-client
       sudo mount -v 192.168.33.11:/ /mnt
