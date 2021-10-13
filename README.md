@@ -80,7 +80,6 @@ EOF
       sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       sudo apt-mark hold kubelet kubeadm kubectl
       sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=192.168.33.100
-      HOME="/root"
       mkdir -p $HOME/.kube
       sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
       sudo chown $(id -u):$(id -g) $HOME/.kube/config
