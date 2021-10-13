@@ -31,8 +31,8 @@ You might use the file of Vagrantfile below:
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  #config.vm.box = "generic/ubuntu2004"
-  config.vm.box = "generic/ubuntu1804"
+  config.vm.box = "generic/ubuntu2004"
+  #config.vm.box = "generic/ubuntu1804"
   config.vm.provider :libvirt do |kvm|
     kvm.memory = 4096
     kvm.cpus = 2
