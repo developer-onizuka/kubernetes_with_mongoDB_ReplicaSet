@@ -31,7 +31,8 @@ You might use the file of Vagrantfile below:
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic/ubuntu2004"
+  config.vm.box = "generic/ubuntu2010"
+  #config.vm.box = "generic/ubuntu2004"
   #config.vm.box = "generic/ubuntu1804"
   config.vm.provider :libvirt do |kvm|
     kvm.memory = 4096
@@ -97,8 +98,8 @@ EOF
       #chmod 700 get_helm.sh
       #./get_helm.sh
       #helm repo add stable https://charts.helm.sh/stable
-      sudo apt-get -y install nfs-client
-      sudo mount -v 192.168.33.11:/ /mnt
+#      sudo apt-get -y install nfs-client
+#      sudo mount -v 192.168.33.11:/ /mnt
     SHELL
   end
 #-------------------- worker1 --------------------#
@@ -133,8 +134,8 @@ EOF
       sudo apt-get install -y -q kubelet kubectl kubeadm
       #sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       #sudo apt-mark hold kubelet kubeadm kubectl
-      sudo apt-get -y install nfs-client
-      sudo mount -v 192.168.33.11:/ /mnt
+#      sudo apt-get -y install nfs-client
+#      sudo mount -v 192.168.33.11:/ /mnt
     SHELL
   end
 #-------------------- worker2 --------------------#
@@ -169,8 +170,8 @@ EOF
       sudo apt-get install -y -q kubelet kubectl kubeadm
       #sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       #sudo apt-mark hold kubelet kubeadm kubectl
-      sudo apt-get -y install nfs-client
-      sudo mount -v 192.168.33.11:/ /mnt
+#      sudo apt-get -y install nfs-client
+#      sudo mount -v 192.168.33.11:/ /mnt
     SHELL
   end
 #-------------------- worker3 --------------------#
@@ -205,8 +206,8 @@ EOF
       sudo apt-get install -y -q kubelet kubectl kubeadm
       #sudo apt-get install -y -q kubelet=1.21.1-00 kubectl=1.21.1-00 kubeadm=1.21.1-00
       #sudo apt-mark hold kubelet kubeadm kubectl
-      sudo apt-get -y install nfs-client
-      sudo mount -v 192.168.33.11:/ /mnt
+#      sudo apt-get -y install nfs-client
+#      sudo mount -v 192.168.33.11:/ /mnt
     SHELL
   end
 #-------------------- haproxy --------------------#
@@ -228,23 +229,23 @@ EOF
       sshpass -p "vagrant" ssh-copy-id -i ~/.ssh/id_rsa.pub vagrant@192.168.33.101
       sshpass -p "vagrant" ssh-copy-id -i ~/.ssh/id_rsa.pub vagrant@192.168.33.102
       sshpass -p "vagrant" ssh-copy-id -i ~/.ssh/id_rsa.pub vagrant@192.168.33.103
-      sudo apt-get -y install nfs-client
-      sudo mount -v 192.168.33.11:/ /mnt
+#      sudo apt-get -y install nfs-client
+#      sudo mount -v 192.168.33.11:/ /mnt
     SHELL
   end
 #-------------------- nfsserver --------------------#
-  config.vm.define "nfsserver_192.168.133.11" do |server|
-    server.vm.network "private_network", ip: "192.168.33.11"
-    server.vm.network "private_network", ip: "192.168.133.11"
-    server.vm.hostname = "nfsserver"
-    server.vm.provision "shell", privileged: false, inline: <<-SHELL
-      sudo apt-get update
-      sudo apt-get install -y docker.io
-      sudo docker pull itsthenetwork/nfs-server-alpine
-      mkdir -p /home/vagrant/shared
-      sudo docker run -itd --name nfs --rm --privileged -p 2049:2049 -v /home/vagrant/shared:/data -e SHARED_DIRECTORY=/data itsthenetwork/nfs-server-alpine:latest
-    SHELL
-  end
+#  config.vm.define "nfsserver_192.168.133.11" do |server|
+#    server.vm.network "private_network", ip: "192.168.33.11"
+#    server.vm.network "private_network", ip: "192.168.133.11"
+#    server.vm.hostname = "nfsserver"
+#    server.vm.provision "shell", privileged: false, inline: <<-SHELL
+#      sudo apt-get update
+#      sudo apt-get install -y docker.io
+#      sudo docker pull itsthenetwork/nfs-server-alpine
+#      mkdir -p /home/vagrant/shared
+#      sudo docker run -itd --name nfs --rm --privileged -p 2049:2049 -v /home/vagrant/shared:/data -e SHARED_DIRECTORY=/data itsthenetwork/nfs-server-alpine:latest
+#    SHELL
+#  end
 #-------------------------------------------------#
 end
 ```
