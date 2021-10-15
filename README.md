@@ -688,7 +688,7 @@ server {
 }
 EOF
 
-$ kubectl create configmap nginx-config --from-file=default.conf
+$ sudo kubectl create configmap nginx-config --from-file=default.conf
 configmap/nginx-config created
 ```
 
